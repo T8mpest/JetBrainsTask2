@@ -8,16 +8,16 @@ public class TestAstNode : IAstNode
 {
     private readonly List<TestAstNode> _children = new();
 
-    public IAstNode Parent { get; private set; }
-    public IAstNode FirstChild => _children.FirstOrDefault();
-    public IAstNode NextSibling { get; private set; }
-    public IAstNode PrevSibling { get; private set; }
+    public IAstNode? Parent { get; private set; }
+    public IAstNode? FirstChild => _children.FirstOrDefault();
+    public IAstNode? NextSibling { get; private set; }
+    public IAstNode? PrevSibling { get; private set; }
     public bool IsWhitespaceOrComment { get; set; }
-    public string Text { get; set; }
+    public string? Text { get; set; }
 
     public string GetText()
     {
-        if (FirstChild == null) return Text ?? string.Empty;
+        if (FirstChild is null) return Text ?? string.Empty;
         return string.Concat(_children.Select(c => c.GetText()));
     }
 
