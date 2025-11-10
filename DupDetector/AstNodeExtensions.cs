@@ -1,4 +1,6 @@
-﻿namespace DefaultNamespace;
+﻿using DupDetector.Interfaces;
+
+namespace DupDetector;
 
 public static class AstNodeExtensions
 {
@@ -6,27 +8,27 @@ public static class AstNodeExtensions
     // Checks if two AST nodes are equivalent ignoring whitespace/comment tokens.
 
     public static bool IsEquivalentTo(this IAstNode node, IAstNode other)
-    {
+      {
         if (ReferenceEquals(node, other)) return true;
         if (node is null || other is null) return false;
-
+    
         using var e1 = EnumerateNonTriviaLeafTexts(node).GetEnumerator();
         using var e2 = EnumerateNonTriviaLeafTexts(other).GetEnumerator();
-
+    
         while (true)
         {
-            var m1 = e1.MoveNext();
-            var m2 = e2.MoveNext();
-            if (!m1 || !m2) return m1 == m2;
-            if (!string.Equals(e1.Current, e2.Current, System.StringComparison.Ordinal))
-                return false;
+          var m1 = e1.MoveNext();
+          var m2 = e2.MoveNext();
+          if (!m1 || !m2) return m1 == m2;
+          if (!string.Equals(e1.Current, e2.Current, System.StringComparison.Ordinal))
+            return false;
         }
-    }
+      }
 
     private static IEnumerable<string> EnumerateNonTriviaLeafTexts(IAstNode root)
     {
         var stack = new Stack<IAstNode>();
-        if (root != null) stack.Push(root);
+        stack.Push(root);
 
         while (stack.Count > 0)
         {
@@ -34,7 +36,7 @@ public static class AstNodeExtensions
             if (n.IsWhitespaceOrComment) continue;
 
             var first = n.FirstChild;
-            if (first == null)
+            if (first is null)
             {
                 yield return n.GetText();
                 continue;
@@ -42,7 +44,7 @@ public static class AstNodeExtensions
 
             // push children right-to-left to traverse left-to-right
             var child = LastChildOf(n);
-            while (child != null)
+            while (child is not null)
             {
                 stack.Push(child);
                 child = child.PrevSibling;
@@ -50,11 +52,11 @@ public static class AstNodeExtensions
         }
     }
 
-    private static IAstNode LastChildOf(IAstNode node)
+    private static IAstNode? LastChildOf(IAstNode node)
     {
         var c = node.FirstChild;
-        if (c == null) return null;
-        while (c.NextSibling != null) c = c.NextSibling;
+        if (c is null) return null;
+        while (c.NextSibling is not null) c = c.NextSibling;
         return c;
     }
 }
